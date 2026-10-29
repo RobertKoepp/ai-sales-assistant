@@ -5,10 +5,76 @@ st.set_page_config(
     page_title="AI Sales Assistant",
     page_icon="💬",
 )
+st.markdown(
+    """
+    <style>
+        .block-container {
+            max-width: 900px;
+            padding-top: 2.5rem;
+            padding-bottom: 3rem;
+        }
+
+        h1 {
+            font-weight: 750;
+            letter-spacing: -0.03em;
+        }
+
+        div.stButton > button {
+            border-radius: 10px;
+            min-height: 2.7rem;
+            font-weight: 600;
+        }
+
+        [data-testid="stTextArea"] textarea {
+            border-radius: 10px;
+        }
+
+        div[data-testid="stAlert"] {
+            border-radius: 10px;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.title("💬 AI Sales Assistant")
 st.caption("Free sales enablement portfolio prototype")
+with st.sidebar:
+    st.header("About this tool")
 
+    st.write(
+        "A sales enablement prototype that helps "
+        "representatives analyze customer inquiries "
+        "and prepare follow-up messages."
+    )
+
+    st.divider()
+
+    st.subheader("Key features")
+
+    st.markdown(
+        """
+        - Customer pain-point detection
+        - Objection identification
+        - Recommended next steps
+        - Discovery questions
+        - Personalized email drafts
+        """
+    )
+
+    st.divider()
+
+    st.subheader("Prototype limitations")
+
+    st.info(
+        "This version uses Python keyword matching "
+        "and templates, not a live AI model. "
+        "Review all results before using them."
+    )
+
+    st.caption(
+        "Portfolio project | Python + Streamlit"
+    )
 st.info(
     "Prototype mode: uses Python rules and templates, "
     "not a live AI model. No API key or paid service required."
