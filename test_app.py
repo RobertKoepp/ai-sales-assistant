@@ -117,3 +117,36 @@ def test_competitor_inquiry_gets_relevant_follow_up():
 
     assert "alternative solutions" in draft
     assert "criteria matter most" in draft
+
+
+def test_email_edits_persist_and_analysis_remains_visible():
+    app = AppTest.from_file("app.py").run()
+
+    # Enter a customer inquiry and analyze it.
+    app.text_area[0].set_value(SAMPLE_INQUIRY)
+    app.button[0].click().run()
+
+    # Confirm the email draft is displayed.
+    assert not app.exception
+    assert len(app.text_area) >= 2
+
+    # Edit the email as a user would.
+    edited_draft = (
+        app.text_area[1].value
+        + "\nI will follow up with you next Tuesday."
+    )
+
+    app.text_area[1].set_value(edited_draft).run()
+
+    # Confirm the edit survives the Streamlit rerun.
+    assert not app.exception
+    assert (
+        "I will follow up with you next Tuesday."
+        in app.text_area[1].value
+    )
+
+    # Confirm the original analysis is still displayed.
+    assert any(
+        "1. Customer summary" in heading.value
+        for heading in app.subheader
+    )
