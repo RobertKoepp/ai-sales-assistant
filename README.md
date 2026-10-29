@@ -1,4 +1,10 @@
 
+## Live Demo
+
+Try the application: [AI Sales Assistant](https://ai-sales-assistant-crfcsjeaxagpf4dkj6pqkv.streamlit.app/)
+
+This prototype demonstrates customer inquiry analysis, potential objection identification, sales discovery questions, and editable follow-up email drafts.
+
 # AI Sales Assistant
 
 A free sales enablement prototype that helps sales representatives analyze customer inquiries, identify potential pain points and objections, recommend discovery questions, and draft customer follow-up emails.
