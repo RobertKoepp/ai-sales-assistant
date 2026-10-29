@@ -104,7 +104,7 @@ Run the tests:
 python -m pytest -q
 ```
 
-The current test suite contains four tests. All four passed in local testing.
+The current test suite contains nine automated tests covering application startup, input validation, draft generation, personalization, communication tones, and customer objection scenarios.
 
 ## Continuous Integration
 
