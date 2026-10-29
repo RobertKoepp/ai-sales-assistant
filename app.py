@@ -5,6 +5,8 @@ st.set_page_config(
     page_title="AI Sales Assistant",
     page_icon="💬",
 )
+
+# Keep the interface clean and readable.
 st.markdown(
     """
     <style>
@@ -37,8 +39,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Initialize persistent state.
+if "analysis_result" not in st.session_state:
+    st.session_state.analysis_result = None
+
+if "email_draft" not in st.session_state:
+    st.session_state.email_draft = ""
+
+if "analysis_warning" not in st.session_state:
+    st.session_state.analysis_warning = ""
+
+# Application heading.
 st.title("💬 AI Sales Assistant")
 st.caption("Free sales enablement portfolio prototype")
+
+# Sidebar.
 with st.sidebar:
     st.header("About this tool")
 
@@ -72,14 +87,14 @@ with st.sidebar:
         "Review all results before using them."
     )
 
-    st.caption(
-        "Portfolio project | Python + Streamlit"
-    )
+    st.caption("Portfolio project | Python + Streamlit")
+
 st.info(
     "Prototype mode: uses Python rules and templates, "
     "not a live AI model. No API key or paid service required."
 )
 
+# Customer inputs.
 inquiry = st.text_area(
     "Customer inquiry",
     height=160,
@@ -87,16 +102,26 @@ inquiry = st.text_area(
         "Example: We're a 12-person agency. We keep missing "
         "customer follow-ups, and we're concerned about price."
     ),
+    key="customer_inquiry",
 )
 
 tone = st.selectbox(
     "Follow-up tone",
     ["Friendly and professional", "Concise", "Consultative"],
+    key="follow_up_tone",
 )
 
+# Analyze the inquiry only when the button is clicked.
 if st.button("Analyze inquiry", type="primary"):
+    st.session_state.analysis_warning = ""
+
     if not inquiry.strip():
-        st.warning("Please enter a customer inquiry.")
+        st.session_state.analysis_result = None
+        st.session_state.email_draft = ""
+        st.session_state.analysis_warning = (
+            "Please enter a customer inquiry."
+        )
+
     else:
         text = inquiry.lower()
 
@@ -126,53 +151,13 @@ if st.button("Analyze inquiry", type="primary"):
         ]):
             objections.append("Comparing alternative solutions")
 
-        # 1. Customer summary
-        st.subheader("1. Customer summary")
+        # Store the analysis so it survives subsequent reruns.
+        st.session_state.analysis_result = {
+            "pain_points": pain_points,
+            "objections": objections,
+        }
 
-        if pain_points:
-            for item in pain_points:
-                st.write(f"- Potential pain point: {item}")
-        else:
-            st.write("No predefined pain-point keywords detected.")
-
-        if objections:
-            for item in objections:
-                st.write(f"- Potential objection: {item}")
-        else:
-            st.write("No predefined objection keywords detected.")
-
-        st.caption(
-            "These findings are based on keyword matching, "
-            "not AI understanding. Review them manually."
-        )
-
-        # 2. Recommend a next step.
-        st.subheader("2. Recommended next step")
-
-        if "Possible price or budget concern" in objections:
-            st.write(
-                "Acknowledge the concern and ask how the customer "
-                "evaluates cost. Don't offer an unauthorized discount."
-            )
-        elif pain_points:
-            st.write(
-                "Ask how the customer handles the process today "
-                "and what they want to improve."
-            )
-        else:
-            st.write(
-                "Ask a discovery question to clarify the customer's "
-                "main goal and current process."
-            )
-
-        st.write("**Suggested discovery questions**")
-        st.write("- How do you handle this process today?")
-        st.write("- What would you most like to improve?")
-        st.write("- What criteria matter most when choosing a solution?")
-
-        # 3. Create a personalized follow-up email.
-        st.subheader("3. Follow-up draft")
-
+        # Personalize the follow-up email.
         topics = []
 
         if pain_points:
@@ -237,21 +222,78 @@ if st.button("Analyze inquiry", type="primary"):
                 "next week?"
             )
 
-        draft = f"Hi there,\n\n{greeting} {body}\n\nBest,"
-
-        st.text_area(
-            "Edit your follow-up",
-            value=draft,
-            height=220,
+        # Save the draft before displaying the editable text area.
+        st.session_state.email_draft = (
+            f"Hi there,\n\n{greeting} {body}\n\nBest,"
         )
 
-        # 4. Human review checklist.
-        st.subheader("4. Human review")
+if st.session_state.analysis_warning:
+    st.warning(st.session_state.analysis_warning)
 
-        st.write("- Verify product claims, pricing, and policies.")
-        st.write("- Check that the message reflects the customer's needs.")
-        st.write("- Review the message before sending.")
+# Display saved analysis results outside the button block.
+# These results remain visible when the user edits the email.
+if st.session_state.analysis_result is not None:
+    result = st.session_state.analysis_result
+    pain_points = result["pain_points"]
+    objections = result["objections"]
 
-        st.success(
-            "Analysis complete. Review the output before using it."
+    st.subheader("1. Customer summary")
+
+    if pain_points:
+        for item in pain_points:
+            st.write(f"- Potential pain point: {item}")
+    else:
+        st.write("No predefined pain-point keywords detected.")
+
+    if objections:
+        for item in objections:
+            st.write(f"- Potential objection: {item}")
+    else:
+        st.write("No predefined objection keywords detected.")
+
+    st.caption(
+        "These findings are based on keyword matching, "
+        "not AI understanding. Review them manually."
+    )
+
+    st.subheader("2. Recommended next step")
+
+    if "Possible price or budget concern" in objections:
+        st.write(
+            "Acknowledge the concern and ask how the customer "
+            "evaluates cost. Don't offer an unauthorized discount."
         )
+    elif pain_points:
+        st.write(
+            "Ask how the customer handles the process today "
+            "and what they want to improve."
+        )
+    else:
+        st.write(
+            "Ask a discovery question to clarify the customer's "
+            "main goal and current process."
+        )
+
+    st.write("**Suggested discovery questions**")
+    st.write("- How do you handle this process today?")
+    st.write("- What would you most like to improve?")
+    st.write("- What criteria matter most when choosing a solution?")
+
+    st.subheader("3. Follow-up draft")
+
+    # The widget's key keeps user edits in session state.
+    st.text_area(
+        "Edit your follow-up",
+        height=220,
+        key="email_draft",
+    )
+
+    st.subheader("4. Human review")
+
+    st.write("- Verify product claims, pricing, and policies.")
+    st.write("- Check that the message reflects the customer's needs.")
+    st.write("- Review the message before sending.")
+
+    st.success(
+        "Analysis complete. Review the output before using it."
+    )
