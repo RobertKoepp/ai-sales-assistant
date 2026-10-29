@@ -94,3 +94,20 @@ Review the results for accuracy and relevance.
 ## Project Goal
 
 This project demonstrates practical skills in Python, application development, sales workflow design, customer experience, and responsible AI implementation. The current version is a foundational prototype intended for further development.
+
+## Testing
+
+The application includes four automated tests covering:
+
+- Application startup without errors
+- Empty customer inquiry handling
+- Follow-up email draft generation
+- Personalization based on customer concerns
+
+### Run the Tests Locally
+
+1. Activate your project's virtual environment.
+2. Install the testing dependency:
+
+   ```bash
+   python -m pip install pytest
