@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 st.set_page_config(
@@ -39,7 +38,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Initialize persistent state.
+# Initialize persistent application state.
 if "analysis_result" not in st.session_state:
     st.session_state.analysis_result = None
 
@@ -94,7 +93,7 @@ st.info(
     "not a live AI model. No API key or paid service required."
 )
 
-# Customer inputs.
+# Customer inquiry input.
 inquiry = st.text_area(
     "Customer inquiry",
     height=160,
@@ -105,13 +104,14 @@ inquiry = st.text_area(
     key="customer_inquiry",
 )
 
+# Email tone selection.
 tone = st.selectbox(
     "Follow-up tone",
     ["Friendly and professional", "Concise", "Consultative"],
     key="follow_up_tone",
 )
 
-# Analyze the inquiry only when the button is clicked.
+# Analyze the inquiry when the button is clicked.
 if st.button("Analyze inquiry", type="primary"):
     st.session_state.analysis_warning = ""
 
@@ -128,36 +128,60 @@ if st.button("Analyze inquiry", type="primary"):
         # Identify potential customer pain points.
         pain_points = []
 
-        if any(word in text for word in [
-            "follow-up", "follow up", "missed", "losing track"
-        ]):
+        if any(
+            word in text
+            for word in [
+                "follow-up",
+                "follow up",
+                "missed",
+                "losing track",
+            ]
+        ):
             pain_points.append("Tracking customer follow-ups")
 
-        if any(word in text for word in [
-            "manual", "slow", "inefficient", "time-consuming"
-        ]):
+        if any(
+            word in text
+            for word in [
+                "manual",
+                "slow",
+                "inefficient",
+                "time-consuming",
+            ]
+        ):
             pain_points.append("Possible workflow inefficiency")
 
         # Identify potential objections.
         objections = []
 
-        if any(word in text for word in [
-            "expensive", "price", "cost", "budget", "afford"
-        ]):
+        if any(
+            word in text
+            for word in [
+                "expensive",
+                "price",
+                "cost",
+                "budget",
+                "afford",
+            ]
+        ):
             objections.append("Possible price or budget concern")
 
-        if any(word in text for word in [
-            "competitor", "alternative", "other vendor"
-        ]):
+        if any(
+            word in text
+            for word in [
+                "competitor",
+                "alternative",
+                "other vendor",
+            ]
+        ):
             objections.append("Comparing alternative solutions")
 
-        # Store the analysis so it survives subsequent reruns.
+        # Store analysis results across Streamlit reruns.
         st.session_state.analysis_result = {
             "pain_points": pain_points,
             "objections": objections,
         }
 
-        # Personalize the follow-up email.
+        # Build context for a personalized follow-up email.
         topics = []
 
         if pain_points:
@@ -179,6 +203,7 @@ if st.button("Analyze inquiry", type="primary"):
                 "and priorities."
             )
 
+        # Choose objection-handling language.
         if "Possible price or budget concern" in objections:
             objection_sentence = (
                 "We can discuss the outcomes and budget criteria "
@@ -192,6 +217,7 @@ if st.button("Analyze inquiry", type="primary"):
         else:
             objection_sentence = ""
 
+        # Select the email tone.
         if tone == "Concise":
             greeting = "Thanks for sharing your situation."
             body = (
@@ -222,21 +248,23 @@ if st.button("Analyze inquiry", type="primary"):
                 "next week?"
             )
 
-        # Save the draft before displaying the editable text area.
+        # Save the generated draft before displaying its text area.
         st.session_state.email_draft = (
             f"Hi there,\n\n{greeting} {body}\n\nBest,"
         )
 
+# Display validation messages.
 if st.session_state.analysis_warning:
     st.warning(st.session_state.analysis_warning)
 
-# Display saved analysis results outside the button block.
-# These results remain visible when the user edits the email.
+# Display saved results outside the button block.
+# Results and email edits persist when Streamlit reruns.
 if st.session_state.analysis_result is not None:
     result = st.session_state.analysis_result
     pain_points = result["pain_points"]
     objections = result["objections"]
 
+    # 1. Customer summary.
     st.subheader("1. Customer summary")
 
     if pain_points:
@@ -256,6 +284,7 @@ if st.session_state.analysis_result is not None:
         "not AI understanding. Review them manually."
     )
 
+    # 2. Recommended next step.
     st.subheader("2. Recommended next step")
 
     if "Possible price or budget concern" in objections:
@@ -277,21 +306,26 @@ if st.session_state.analysis_result is not None:
     st.write("**Suggested discovery questions**")
     st.write("- How do you handle this process today?")
     st.write("- What would you most like to improve?")
-    st.write("- What criteria matter most when choosing a solution?")
+    st.write(
+        "- What criteria matter most when choosing a solution?"
+    )
 
+    # 3. Editable follow-up draft.
     st.subheader("3. Follow-up draft")
 
-    # The widget's key keeps user edits in session state.
     st.text_area(
         "Edit your follow-up",
         height=220,
         key="email_draft",
     )
 
+    # 4. Human review checklist.
     st.subheader("4. Human review")
 
     st.write("- Verify product claims, pricing, and policies.")
-    st.write("- Check that the message reflects the customer's needs.")
+    st.write(
+        "- Check that the message reflects the customer's needs."
+    )
     st.write("- Review the message before sending.")
 
     st.success(
