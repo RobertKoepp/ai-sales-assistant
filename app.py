@@ -4,126 +4,109 @@ import streamlit as st
 st.set_page_config(
     page_title="AI Sales Assistant",
     page_icon="💬",
-    layout="centered",
 )
 
 st.title("💬 AI Sales Assistant")
-st.caption("A sales enablement portfolio prototype")
+st.caption("Free sales enablement portfolio prototype")
 
 st.info(
-    "Prototype mode: this version uses Python rules and templates. "
-    "It does not call an AI model or send customer messages."
-)
-
-st.markdown(
-    "Analyze a customer inquiry, identify potential objections, "
-    "and generate a follow-up draft."
+    "Prototype mode: uses Python rules and templates, "
+    "not a live AI model. No API key or paid service required."
 )
 
 inquiry = st.text_area(
     "Customer inquiry",
-    height=180,
+    height=160,
     placeholder=(
-        "Example: We're a 12-person agency and keep missing "
-        "customer follow-ups. We're interested, but worried "
-        "about the price."
+        "Example: We're a 12-person agency. We keep missing "
+        "customer follow-ups, and we're concerned about price."
     ),
 )
 
 tone = st.selectbox(
-    "Response tone",
+    "Follow-up tone",
     ["Friendly and professional", "Concise", "Consultative"],
 )
 
 if st.button("Analyze inquiry", type="primary"):
     if not inquiry.strip():
-        st.warning("Enter a customer inquiry first.")
+        st.warning("Please enter a customer inquiry.")
     else:
         text = inquiry.lower()
 
-        # Simple keyword-based rules, not AI reasoning.
+        # Identify potential customer pain points.
         pain_points = []
+
         if any(word in text for word in [
             "follow-up", "follow up", "missed", "losing track"
         ]):
             pain_points.append("Tracking customer follow-ups")
 
         if any(word in text for word in [
-            "time-consuming", "manual", "slow", "inefficient"
+            "manual", "slow", "inefficient", "time-consuming"
         ]):
-            pain_points.append("Potential workflow inefficiency")
+            pain_points.append("Possible workflow inefficiency")
 
+        # Identify potential objections.
         objections = []
+
         if any(word in text for word in [
             "expensive", "price", "cost", "budget", "afford"
         ]):
-            objections.append("Price or budget concern")
+            objections.append("Possible price or budget concern")
 
         if any(word in text for word in [
             "competitor", "alternative", "other vendor"
         ]):
-            objections.append("Comparing alternatives")
+            objections.append("Comparing alternative solutions")
 
-        if any(word in text for word in [
-            "not sure", "unsure", "concerned", "worried", "risk"
-        ]):
-            objections.append("Uncertainty or perceived risk")
-
+        # 1. Customer summary
         st.subheader("1. Customer summary")
 
         if pain_points:
-            st.write("**Potential pain points**")
-            for point in pain_points:
-                st.write(f"- {point}")
+            for item in pain_points:
+                st.write(f"- Potential pain point: {item}")
         else:
-            st.write(
-                "- No predefined pain-point keywords detected. "
-                "Review the inquiry manually."
-            )
+            st.write("No predefined pain-point keywords detected.")
 
         if objections:
-            st.write("**Potential objections**")
-            for objection in objections:
-                st.write(f"- {objection}")
+            for item in objections:
+                st.write(f"- Potential objection: {item}")
         else:
-            st.write(
-                "**Potential objections:** None detected by the "
-                "current keyword rules."
-            )
+            st.write("No predefined objection keywords detected.")
 
-        st.write(
-            "**Important:** These are keyword-based suggestions, "
-            "not a verified interpretation of the customer's intent."
+        st.caption(
+            "These findings are based on keyword matching, "
+            "not AI understanding. Review them manually."
         )
 
+        # 2. Recommend a next step.
         st.subheader("2. Recommended next step")
 
-        if "Price or budget concern" in objections:
+        if "Possible price or budget concern" in objections:
             st.write(
-                "Acknowledge the budget concern and ask what "
-                "criteria the customer is using to evaluate cost. "
-                "Do not offer an unapproved discount."
+                "Acknowledge the concern and ask how the customer "
+                "evaluates cost. Don't offer an unauthorized discount."
             )
         elif pain_points:
             st.write(
-                "Ask how the customer handles this process today "
-                "and what a successful improvement would look like."
+                "Ask how the customer handles the process today "
+                "and what they want to improve."
             )
         else:
             st.write(
                 "Ask a discovery question to clarify the customer's "
-                "main goal, current process, and desired outcome."
+                "main goal and current process."
             )
 
         st.write("**Suggested discovery questions**")
-        st.write("- How are you handling this process today?")
+        st.write("- How do you handle this process today?")
         st.write("- What would you most like to improve?")
-        st.write("- What criteria will help you evaluate a solution?")
+        st.write("- What criteria matter most when choosing a solution?")
 
-
+        # 3. Create a personalized follow-up email.
         st.subheader("3. Follow-up draft")
 
-        # Personalize the draft using detected customer concerns.
         topics = []
 
         if pain_points:
@@ -196,21 +179,13 @@ if st.button("Analyze inquiry", type="primary"):
             height=220,
         )
 
-
+        # 4. Human review checklist.
         st.subheader("4. Human review")
 
-        st.write(
-            "- Verify product features, pricing, and company policies."
-        )
-        st.write(
-            "- Confirm the draft reflects the customer's actual needs."
-        )
-        st.write(
-            "- Review the response before sending it."
-        )
+        st.write("- Verify product claims, pricing, and policies.")
+        st.write("- Check that the message reflects the customer's needs.")
+        st.write("- Review the message before sending.")
 
-        st.caption(
-            "Prototype limitation: keyword rules can miss context, "
-            "misread intent, or generate generic recommendations. "
-            "No live AI model is used."
+        st.success(
+            "Analysis complete. Review the output before using it."
         )
