@@ -85,7 +85,7 @@ Open the local URL displayed in the terminal, usually `http://localhost:8501`.
 
 ## Automated Testing
 
-The project includes nine automated tests covering:
+The project includes ten automated tests covering:
 
 - Application startup without errors
 - Empty customer inquiry handling
@@ -104,7 +104,7 @@ Run the tests:
 python -m pytest -q
 ```
 
-The current test suite contains nine automated tests covering application startup, input validation, draft generation, personalization, communication tones, and customer objection scenarios.
+The current test suite contains ten automated tests covering application startup, input validation, draft generation, personalization, communication tones, and customer objection scenarios.
 
 ## Continuous Integration
 
