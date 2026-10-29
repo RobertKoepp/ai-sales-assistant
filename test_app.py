@@ -1,4 +1,3 @@
-
 from streamlit.testing.v1 import AppTest
 
 
@@ -61,7 +60,10 @@ def test_friendly_tone():
 
     draft = app.text_area[-1].value
 
-    assert "Thanks for sharing a little about your team." in draft
+    assert (
+        "Thanks for sharing a little about your team."
+        in draft
+    )
 
 
 def test_concise_tone():
@@ -85,10 +87,10 @@ def test_consultative_tone():
     app.text_area[0].set_value(SAMPLE_INQUIRY)
     app.button[0].click().run()
 
-    draft = app.text_area[-1].value
+    draft = app.text_area[-1].value.lower()
 
-    assert "discovery call" in draft.lower()
-    assert "successful outcome" in draft.lower()
+    assert "discovery call" in draft
+    assert "successful outcome" in draft
 
 
 def test_inquiry_without_known_keywords_uses_fallback():
@@ -122,15 +124,15 @@ def test_competitor_inquiry_gets_relevant_follow_up():
 def test_email_edits_persist_and_analysis_remains_visible():
     app = AppTest.from_file("app.py").run()
 
-    # Enter a customer inquiry and analyze it.
+    # Submit a customer inquiry.
     app.text_area[0].set_value(SAMPLE_INQUIRY)
     app.button[0].click().run()
 
-    # Confirm the email draft is displayed.
+    # Confirm that a draft was generated.
     assert not app.exception
     assert len(app.text_area) >= 2
 
-    # Edit the email as a user would.
+    # Simulate editing the email.
     edited_draft = (
         app.text_area[1].value
         + "\nI will follow up with you next Tuesday."
@@ -138,14 +140,14 @@ def test_email_edits_persist_and_analysis_remains_visible():
 
     app.text_area[1].set_value(edited_draft).run()
 
-    # Confirm the edit survives the Streamlit rerun.
+    # Verify the user's edit persists after the rerun.
     assert not app.exception
     assert (
         "I will follow up with you next Tuesday."
         in app.text_area[1].value
     )
 
-    # Confirm the original analysis is still displayed.
+    # Verify the customer analysis remains visible.
     assert any(
         "1. Customer summary" in heading.value
         for heading in app.subheader
