@@ -85,7 +85,7 @@ Open the local URL displayed in the terminal, usually `http://localhost:8501`.
 
 ## Automated Testing
 
-The project includes four automated tests covering:
+The project includes nine automated tests covering:
 
 - Application startup without errors
 - Empty customer inquiry handling
