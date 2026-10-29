@@ -120,44 +120,82 @@ if st.button("Analyze inquiry", type="primary"):
         st.write("- What would you most like to improve?")
         st.write("- What criteria will help you evaluate a solution?")
 
+
         st.subheader("3. Follow-up draft")
 
-        if tone == "Concise":
-            draft = (
-                "Hi there,\n\n"
-                "Thanks for sharing your situation. I'd like to "
-                "learn more about your current process and what "
-                "you'd like to improve. Would you be open to a "
-                "short conversation next week?\n\n"
-                "Best,"
-            )
-        elif tone == "Consultative":
-            draft = (
-                "Hi there,\n\n"
-                "Thanks for explaining your current challenges. "
-                "Before recommending a solution, I'd like to "
-                "understand how your team handles this process "
-                "today and what a better outcome would look like. "
-                "Would you be available for a short discovery "
-                "conversation next week?\n\n"
-                "Best,"
+        # Personalize the draft using detected customer concerns.
+        topics = []
+
+        if pain_points:
+            topics.append(pain_points[0].lower())
+
+        if "Possible price or budget concern" in objections:
+            topics.append("cost and budget")
+
+        if "Comparing alternative solutions" in objections:
+            topics.append("comparing alternative solutions")
+
+        if topics:
+            context_sentence = (
+                "You mentioned " + ", ".join(topics) + "."
             )
         else:
-            draft = (
-                "Hi there,\n\n"
-                "Thanks for sharing a little about your team. "
-                "I'd be interested to learn more about your "
-                "current process and the main challenge you're "
-                "trying to solve. Would you be open to a short "
-                "conversation next week?\n\n"
-                "Best,"
+            context_sentence = (
+                "I'd like to learn more about your current process "
+                "and priorities."
             )
 
+        if "Possible price or budget concern" in objections:
+            objection_sentence = (
+                "We can discuss the outcomes and budget criteria "
+                "that matter most to your team."
+            )
+        elif "Comparing alternative solutions" in objections:
+            objection_sentence = (
+                "I'd be interested to learn which criteria matter "
+                "most as you compare options."
+            )
+        else:
+            objection_sentence = ""
+
+        if tone == "Concise":
+            greeting = "Thanks for sharing your situation."
+            body = (
+                f"{context_sentence} {objection_sentence} "
+                "Would you be open to a short conversation next week?"
+            )
+
+        elif tone == "Consultative":
+            greeting = (
+                "Thanks for explaining your team's current challenges."
+            )
+            body = (
+                f"{context_sentence} {objection_sentence} "
+                "Before recommending a solution, I'd like to understand "
+                "your current process and what a successful outcome "
+                "would look like. Would you be available for a short "
+                "discovery call?"
+            )
+
+        else:
+            greeting = (
+                "Thanks for sharing a little about your team."
+            )
+            body = (
+                f"{context_sentence} {objection_sentence} "
+                "I'd be happy to learn more and see whether we might "
+                "be a fit. Would you be open to a short conversation "
+                "next week?"
+            )
+
+        draft = f"Hi there,\n\n{greeting} {body}\n\nBest,"
+
         st.text_area(
-            "Edit and copy your draft",
+            "Edit your follow-up",
             value=draft,
-            height=190,
+            height=220,
         )
+
 
         st.subheader("4. Human review")
 
